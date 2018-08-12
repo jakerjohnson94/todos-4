@@ -9,7 +9,7 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4"
   },
-  "homepage": "https://jakerjohnson94.github.io/todos-3",
+  "homepage": "https://jakerjohnson94.github.io/todos-3/",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",

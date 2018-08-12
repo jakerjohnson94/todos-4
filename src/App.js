@@ -130,9 +130,9 @@ class App extends Component {
         </header>
         <section className="todoapp">
           <Switch>
-            <Route exact path="/" component={Home} />;
-            <Route exact path="/completed" component={Completed} />;
-            <Route exact path="/active" component={Active} />;
+            <Route exact path="./" component={Home} />;
+            <Route exact path="./completed" component={Completed} />;
+            <Route exact path="./active" component={Active} />;
           </Switch>
         </section>
         {todos.length ? (
@@ -142,14 +142,14 @@ class App extends Component {
               <strong>{todos.length}</strong> item(s) left
             </span>
 
-            <Link className="link" to="/">
+            <Link className="link" to="./">
               All
             </Link>
 
-            <Link className="link" to="/active">
+            <Link className="link" to="./active">
               Active
             </Link>
-            <Link className="link" to="/completed">
+            <Link className="link" to="./completed">
               Complete
             </Link>
 
