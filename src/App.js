@@ -17,7 +17,7 @@ class App extends Component {
     let todos = this.state.todos;
     if (event.key === 'Enter') {
       const lastTodo = todos[todos.length - 1];
-      console.log(lastTodo);
+
       const newTodo = {
         userId: 1,
         id: lastTodo ? lastTodo.id + 1 : 1,
@@ -26,6 +26,7 @@ class App extends Component {
       };
       todos.push(newTodo);
       this.setState({ todos: todos });
+      event.target.value = '';
     }
   };
 
