@@ -3,49 +3,7 @@ import React, { Component } from 'react';
 import { Route, Link, Switch } from 'react-router-dom';
 import './App.css';
 import todoList from './todos.json';
-
-const TodoItem = props => (
-  <li key={props.id} className={props.completed ? 'completed' : ''}>
-    <div className="view">
-      <input
-        className="toggle"
-        onClick={props.handleCheckClick}
-        type="checkbox"
-        defaultChecked={props.completed}
-      />
-      <label>{props.title}</label>
-      <button onClick={props.handleDeleteClick} className="destroy" />
-    </div>
-  </li>
-);
-
-class TodoList extends Component {
-  render() {
-    const todos = this.props.todos;
-
-    return (
-      <React.Fragment>
-        {todos.length ? (
-          <section className="main">
-            <ul className="todo-list">
-              {todos.map(todo => (
-                <TodoItem
-                  key={todo.id}
-                  id={todo.id}
-                  title={todo.title}
-                  completed={todo.completed}
-                  handleCheckClick={this.props.handleCheckClick(todo.id)}
-                  handleDeleteClick={this.props.handleDeleteClick(todo.id)}
-                />
-              ))}
-            </ul>
-          </section>
-        ) : null}
-        {/* This footer should hidden by default and shown when there are todos */}
-      </React.Fragment>
-    );
-  }
-}
+import TodoList from './ToDoList.js';
 
 class App extends Component {
   constructor(props) {
@@ -130,9 +88,9 @@ class App extends Component {
         </header>
         <section className="todoapp">
           <Switch>
-            <Route exact path="./" component={Home} />;
-            <Route exact path="./completed" component={Completed} />;
-            <Route exact path="./active" component={Active} />;
+            <Route exact path="/" component={Home} />;
+            <Route exact path="/completed" component={Completed} />;
+            <Route exact path="/active" component={Active} />;
           </Switch>
         </section>
         {todos.length ? (
