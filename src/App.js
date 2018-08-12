@@ -97,7 +97,7 @@ class App extends Component {
           <footer className="footer">
             {/* This should be `0 items left` by default */}
             <span className="todo-count">
-              <strong>{todos.length}</strong> item(s) left
+              <strong>{todos.length ? todos.length : 0}</strong> item(s) left
             </span>
 
             <Link className="link" to="./">
@@ -112,7 +112,7 @@ class App extends Component {
             </Link>
 
             {/* Remove this if you don't implement routing */}
-            {/* Hidden if no completed items are left ↓ */}
+            {}
             {todos.filter(a => a.completed).length ? (
               <button onClick={this.handleClearClick} className="clear-completed">
                 Clear completed
