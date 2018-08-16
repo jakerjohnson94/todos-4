@@ -1,4 +1,5 @@
 import React from 'react';
+
 const TodoItem = props => (
   <li key={props.id} className={props.completed ? 'completed' : ''}>
     <div className="view">

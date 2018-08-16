@@ -1,92 +1,130 @@
 import React, { Component } from 'react';
 
-import { Route, Link, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
+import { createStore } from 'redux';
+import { connect, Provider } from 'react-redux';
 import './App.css';
-import todoList from './todos.json';
-import TodoList from './ToDoList.js';
 
-class App extends Component {
+import todoList from './todos.json';
+import Header from './Header.js';
+import TodoList from './ToDoList.js';
+import Footer from './Footer.js';
+import {
+  addTodo,
+  removeTodo,
+  markTodo,
+  clearCompleted,
+  ADD_TODO,
+  DELETE_TODO,
+  MARK_COMPLETE,
+  CLEAR_COMPLETED,
+} from './actions.js';
+//Redux:
+
+const todoReducer = (state = todoList, action) => {
+  let newState;
+  switch (action.type) {
+    case ADD_TODO:
+      return [...state, action.todo];
+    case DELETE_TODO:
+      newState = state.slice();
+      newState.splice(action.index, 1);
+      return newState;
+    case MARK_COMPLETE:
+      newState = state.slice();
+      let todo = newState.find(a => a.id === action.todo.id);
+      todo.completed === true ? (todo.completed = false) : (todo.completed = true);
+      return newState;
+    case CLEAR_COMPLETED:
+      newState = state.slice();
+      newState = newState.filter(a => !a.completed);
+      return newState;
+    default:
+      return state;
+  }
+};
+const store = createStore(todoReducer);
+//React:
+
+class Presentational extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      todos: todoList,
+      input: '',
     };
   }
 
-  handleKeyPress = event => {
-    let todos = this.state.todos;
+  submitTodo = event => {
+    let todos = this.props.todos;
     if (event.key === 'Enter') {
       const lastTodo = todos[todos.length - 1];
 
       const newTodo = {
         userId: 1,
         id: lastTodo ? lastTodo.id + 1 : 1,
-        title: event.target.value,
+        title: this.state.input,
         completed: false,
       };
-      todos.push(newTodo);
-      this.setState({ todos: todos });
-      event.target.value = '';
+
+      this.props.submitNewTodo(newTodo);
+
+      this.setState({
+        input: '',
+      });
     }
+  };
+  handleChange = event => {
+    this.setState({
+      input: event.target.value,
+    });
   };
 
   handleCheckClick = id => event => {
-    let todos = this.state.todos;
-    const listElement = event.target.parentElement.parentElement;
+    let todos = this.props.todos;
 
     const todo = todos.find(a => a.id === id);
-    todo.completed === true ? (todo.completed = false) : (todo.completed = true);
-    listElement.classList.toggle('completed');
-
-    this.setState({ todo: todos });
+    this.props.markComplete(todo);
   };
 
   handleDeleteClick = id => () => {
-    let todos = this.state.todos;
-
-    todos = todos.filter(a => a.id !== id);
-
-    this.setState({ todos: todos });
+    let todos = this.props.todos;
+    todos = todos.filter(a => a.id !== id)[0];
+    this.props.removeOldTodo(todos);
   };
   handleClearClick = () => {
-    let todos = this.state.todos;
+    let todos = this.props.todos;
     todos = todos.filter(a => !a.completed);
-    this.setState({ todos: todos });
+    this.props.clearCompletedTodos(todos);
   };
   render() {
     const Home = () => (
       <TodoList
-        todos={this.state.todos}
+        handleChange={this.handleChange}
+        todos={this.props.todos}
         handleCheckClick={this.handleCheckClick}
         handleDeleteClick={this.handleDeleteClick}
       />
     );
     const Completed = () => (
       <TodoList
-        todos={this.state.todos.filter(a => a.completed)}
+        handleChange={this.handleChange}
+        todos={this.props.todos.filter(a => a.completed)}
         handleCheckClick={this.handleCheckClick}
         handleDeleteClick={this.handleDeleteClick}
       />
     );
     const Active = () => (
       <TodoList
-        todos={this.state.todos.filter(a => !a.completed)}
+        todos={this.props.todos.filter(a => !a.completed)}
         handleCheckClick={this.handleCheckClick}
         handleDeleteClick={this.handleDeleteClick}
       />
     );
-    let todos = this.state.todos;
+
     return (
       <React.Fragment>
-        <header className="header">
-          <h1>todos</h1>
-          <input
-            className="new-todo"
-            onKeyPress={this.handleKeyPress}
-            placeholder="What needs to be done?"
-            autoFocus
-          />
-        </header>
+        <Header submitTodo={this.submitTodo} handleChange={this.handleChange} />
+
         <section className="todoapp">
           <Switch>
             <Route exact path="/" component={Home} />;
@@ -94,32 +132,8 @@ class App extends Component {
             <Route exact path="/active" component={Active} />;
           </Switch>
         </section>
-        {todos.length ? (
-          <footer className="footer">
-            {/* This should be `0 items left` by default */}
-            <span className="todo-count">
-              <strong>{todos.length ? todos.length : 0}</strong> item(s) left
-            </span>
-
-            <Link className="link" to="./">
-              All
-            </Link>
-
-            <Link className="link" to="./active">
-              Active
-            </Link>
-            <Link className="link" to="./completed">
-              Complete
-            </Link>
-
-            {/* Remove this if you don't implement routing */}
-            {}
-            {todos.filter(a => a.completed).length ? (
-              <button onClick={this.handleClearClick} className="clear-completed">
-                Clear completed
-              </button>
-            ) : null}
-          </footer>
+        {this.props.todos.length ? (
+          <Footer handleClearClick={this.handleClearClick} todos={this.props.todos} />
         ) : null}
       </React.Fragment>
     );
@@ -127,4 +141,40 @@ class App extends Component {
 }
 // }
 
-export default App;
+const mapStateToProps = state => {
+  return { todos: state };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    removeOldTodo: todo => {
+      dispatch(removeTodo(todo));
+    },
+    submitNewTodo: todo => {
+      dispatch(addTodo(todo));
+    },
+    markComplete: todo => {
+      dispatch(markTodo(todo));
+    },
+    clearCompletedTodos: todos => {
+      dispatch(clearCompleted(todos));
+    },
+  };
+};
+
+const Container = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Presentational);
+
+class AppWrapper extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <Container />
+      </Provider>
+    );
+  }
+}
+
+export default AppWrapper;

@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import TodoItem from './ToDoItem.js';
 class TodoList extends Component {
   render() {
-    const todos = this.props.todos;
-
     return (
       <React.Fragment>
-        {todos.length ? (
+        {this.props.todos.length ? (
           <section className="main">
             <ul className="todo-list">
-              {todos.map(todo => (
+              {this.props.todos.map(todo => (
                 <TodoItem
                   key={todo.id}
                   id={todo.id}
@@ -26,4 +25,8 @@ class TodoList extends Component {
     );
   }
 }
-export default TodoList;
+
+const mapStateToProps = state => {
+  return { todos: state };
+};
+export default connect(mapStateToProps)(TodoList);
